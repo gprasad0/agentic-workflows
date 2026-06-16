@@ -29,8 +29,6 @@ class parsedCallData(BaseModel):
 
 
 # -----------AGENT 2 OUTPUT SCHEMA-----------#
-
-
 class ResearchOutput(BaseModel):
     company_summary: str  # what the company does
     target_audience: str  # who they are targeting
@@ -44,8 +42,6 @@ class ResearchOutput(BaseModel):
 
 
 # -----------AGENT 3 OUTPUT SCHEMA-----------#
-
-
 class RetrievedContext(BaseModel):
     relevant_proposal_sections: list[str] = []  # past proposal snippets
     case_studies: list[str] = []  # Matching case studies
@@ -55,3 +51,57 @@ class RetrievedContext(BaseModel):
 
 
 # -----------AGENT 4 OUTPUT SCHEMA-----------#
+class ProposalSections(BaseModel):
+    executive_summary: str
+    situtation_analysis: str
+    proposed_approach: str
+    scope_and_deliverables: str
+    timeline: str
+    investment: str
+    case_studies: str
+    why_us: str
+    next_steps: str
+
+
+# -----------AGENT 5 OUTPUT SCHEMA-----------#
+class SectionScore(BaseModel):
+    section_name: str
+    score: int = Field(..., ge=1, le=10)  # Score between 1 and 10
+    feedback: str  # whats wrong or right
+    needs_regeneration: bool  # should this be rewritten or not
+
+
+class ReviewResult(BaseModel):
+    reviewed_sections: ProposalSections  # Improved versions
+    section_scores: list[SectionScore]
+    overall_score: int = Field(..., ge=1, le=10)
+    flags: list[str]  # any major issues for human attention
+    suggestions: list[str]  # Recommendations for user
+
+
+# -----------PIPELINE STATE-----------#
+class PipelineStatus(str, Enum):
+    PARSING = "parsing"
+    RESEARCHING = "researching"
+    RETRIEVING = "retrieving"
+    GENERATING = "generating"
+    REVIEWING = "reviewing"
+    COMPLETE = "complete"
+    ERROR = "error"
+
+
+class PipelineState(BaseModel):
+    status: PipelineStatus
+    parsed: parsedCallData | None = None
+    research: ResearchOutput | None = None
+    retrieved: RetrievedContext | None = None
+    sections: ProposalSections | None = None
+    review: ReviewResult | None = None
+    error: str | None = None
+
+
+# -----------HUMAN IN THE LOOP-----------#
+class RegenrateRequest(BaseModel):
+    section_name: str  # Which section to redo
+    instructions: str = ""  # Any specific instructions for regeneration
+    # eg, "Make the pricing more specific or Add more details about SEO"
