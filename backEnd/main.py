@@ -1,12 +1,24 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.proposalAgent.api.proposals import proposal
 
-print(
-    "Hello from main.py!", proposal()
-)  # Debug statement to confirm the file is being executed
-app = FastAPI()
+from app.proposalAgent.models.db_models import create_tables
+
+print("Hello from main.py!")  # Debug statement to confirm the file is being executed
 
 
-@app.get("/")
-async def root():
-    return proposal()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Initializing database...")
+    create_tables()
+
+    yield
+
+    print("Shutting down...")
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+# @app.get("/")
+# async def root():
+#     return proposal()

@@ -3,8 +3,15 @@ import sqlite3
 DB_NAME = "app.db"
 
 
-def create_tables():
+def get_connection():
     conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+def create_tables():
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
