@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-
 from app.proposalAgent.models.db_models import create_tables
+from appRouter import router
 
 print("Hello from main.py!")  # Debug statement to confirm the file is being executed
 
@@ -17,8 +17,4 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
-
-# @app.get("/")
-# async def root():
-#     return proposal()
+app.include_router(router)
