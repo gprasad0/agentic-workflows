@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from app.proposalAgent.api.proposals import proposal
+from app.proposalAgent.api.proposals import createProposal
+from app.proposalAgent.api.proposals import getProposal
 from app.proposalAgent.models.schemas import (
     parsedCallData,
     ResearchOutput,
@@ -13,6 +14,12 @@ router = APIRouter()
 
 
 @router.post("/proposalAgent")
-async def get_proposal(body: ProposalRequest):
-    proposalData = proposal(body)
+async def add_proposal(body: ProposalRequest):
+    proposalData = createProposal(body)
+    return proposalData
+
+
+@router.get("/proposalAgent/{proposal_id}")
+async def retrieve_proposal(proposal_id: int):
+    proposalData = getProposal(proposal_id)
     return proposalData
