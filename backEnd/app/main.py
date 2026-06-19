@@ -17,3 +17,4 @@
 
 
 # app = FastAPI(lifespan=lifespan)
+# print("Shutting down...")

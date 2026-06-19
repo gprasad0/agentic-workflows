@@ -4,7 +4,7 @@ from enum import Enum
 
 # -----------INPUT SCHEMA-----------#
 class ProposalRequest(BaseModel):
-    title: str = Field(..., example="New Marketing Strategy")
+    title: str
     description: str
     budget: float
     call_notes: str
