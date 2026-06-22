@@ -5,7 +5,7 @@ DB_NAME = "app.db"
 
 def get_connection():
     conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    conn.row_factory = sqlite3.Row  # Enable dictionary-like access to rows -> row[id]
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 

@@ -12,13 +12,13 @@ def createProposal(body: ProposalRequest):
         VALUES (?, ?, ?, ?, ?, ?)
         """,
         (
+            body.prospect_url,
+            body.call_notes,
             body.title,
             body.description,
             body.budget,
-            body.call_notes,
-            body.prospect_url,
             body.additional_context,
-        ),
+        ),  # prevents SQL injection by using parameterized queries
     )
     proposal_id = cursor.lastrowid
     db_connection.commit()
