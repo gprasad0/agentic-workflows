@@ -1,8 +1,12 @@
 from app.proposalAgent.models.schemas import ProposalRequest
 from app.proposalAgent.models.db_models import get_connection
 
+from app.llm.client import client
 
-def createProposal(body: ProposalRequest):
+
+async def createProposal(body: ProposalRequest):
+    researchedData = researchProposal(body)
+
     db_connection = get_connection()
     # Implement proposal generation logic here
     cursor = db_connection.cursor()
@@ -26,7 +30,7 @@ def createProposal(body: ProposalRequest):
     return {"message": "Proposal generated successfully", "proposal_id": proposal_id}
 
 
-def getProposal(proposal_id: int):
+async def getProposal(proposal_id: int):
     db_connection = get_connection()
     cursor = db_connection.cursor()
     cursor.execute(
@@ -35,9 +39,17 @@ def getProposal(proposal_id: int):
         """,
         (proposal_id,),
     )
+    lmdata = await client.generate("tell me a joke in 10 words")
     proposal_data = cursor.fetchone()
     db_connection.close()
     if proposal_data:
         return dict(proposal_data)
     else:
         return {"message": "Proposal not found"}
+
+
+def researchProposal(body: ProposalRequest):
+    return {
+        "research_output": "Research output based on the provided proposal request.",
+        "retrieved_context": "Retrieved context relevant to the proposal.",
+    }

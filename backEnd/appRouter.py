@@ -21,5 +21,5 @@ async def add_proposal(body: ProposalRequest):
 
 @router.get("/proposalAgent/{proposal_id}")
 async def retrieve_proposal(proposal_id: int):
-    proposalData = getProposal(proposal_id)
+    proposalData = await getProposal(proposal_id)
     return proposalData

@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str | None = None
     OPENAI_API_KEY: str | None = None
 
-    MODEL_NAME: str = "google/gemini-2.5-flash"
+    MODEL_NAME: str = "gemini-2.5-flash"
 
     REQUEST_TIMEOUT: int = 60
     MAX_RETRIES: int = 3
