@@ -9,7 +9,8 @@ from app.proposalAgent.agents.prompts import parseDataPrompt
 
 
 async def createProposal(body: ProposalRequest):
-    researchedData = await parseData(body)
+    parsedData = await parseData(body)
+    researchedData = await researchProposal(parsedData)
 
     db_connection = get_connection()
     # Implement proposal generation logic here
@@ -61,7 +62,7 @@ async def parseData(body: ProposalRequest):
     return parsed_data
 
 
-def researchProposal(body: ProposalRequest):
+async def researchProposal(parsedData: parsedCallData):
     return {
         "research_output": "Research output based on the provided proposal request.",
         "retrieved_context": "Retrieved context relevant to the proposal.",
