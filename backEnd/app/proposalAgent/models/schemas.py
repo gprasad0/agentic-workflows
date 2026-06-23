@@ -26,6 +26,7 @@ class parsedCallData(BaseModel):
     decision_makers: list[str] = []  # Any decision makers mentioned
     current_solution: str = ""  # What they are currently using (if mentioned)
     competitors: list[str] = []  # Any competitors mentioned
+    prospect_url: str = ""  # URL for reference
 
 
 # -----------AGENT 2 OUTPUT SCHEMA-----------#

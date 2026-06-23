@@ -1,11 +1,15 @@
-from app.proposalAgent.models.schemas import ProposalRequest
+from app.proposalAgent.models.schemas import (
+    ProposalRequest,
+    parsedCallData,
+)
 from app.proposalAgent.models.db_models import get_connection
 
 from app.llm.client import client
+from app.proposalAgent.agents.prompts import parseDataPrompt
 
 
 async def createProposal(body: ProposalRequest):
-    researchedData = researchProposal(body)
+    researchedData = await parseData(body)
 
     db_connection = get_connection()
     # Implement proposal generation logic here
@@ -39,13 +43,22 @@ async def getProposal(proposal_id: int):
         """,
         (proposal_id,),
     )
-    lmdata = await client.generate("tell me a joke in 10 words")
     proposal_data = cursor.fetchone()
     db_connection.close()
     if proposal_data:
         return dict(proposal_data)
     else:
         return {"message": "Proposal not found"}
+
+
+async def parseData(body: ProposalRequest):
+    prompt = parseDataPrompt.format(ProposalRequest=body.model_dump_json(indent=2))
+    parsed_data = await client.generate_structured(prompt, parsedCallData)
+    print(
+        f"Raw LLM response for structured output:\n{parsed_data.model_dump_json(indent=2)}\n"
+    )
+
+    return parsed_data
 
 
 def researchProposal(body: ProposalRequest):

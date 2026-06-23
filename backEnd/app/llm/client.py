@@ -1,6 +1,10 @@
 from openai import AsyncOpenAI
+from pydantic import BaseModel
+from typing import TypeVar, Type
 
 from config import settings
+
+T = TypeVar("T", bound=BaseModel)
 
 
 class LLMClient:
@@ -20,7 +24,22 @@ class LLMClient:
         print(response.model_dump_json(indent=2))
 
         return response.choices[0].message.content
-        # return "hi"
+
+    async def generate_structured(self, prompt: str, response_model: Type[T]) -> T:
+        """Send a prompt and get back a validated Pydantic model instance."""
+        response = await self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            response_format={
+                "type": "json_schema",
+                "json_schema": {
+                    "name": response_model.__name__,
+                    "schema": response_model.model_json_schema(),
+                },
+            },
+        )
+        raw = response.choices[0].message.content
+        return response_model.model_validate_json(raw)
 
 
 client = LLMClient()

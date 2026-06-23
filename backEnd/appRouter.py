@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.post("/proposalAgent")
 async def add_proposal(body: ProposalRequest):
-    proposalData = createProposal(body)
+    proposalData = await createProposal(body)
     return proposalData
 
 
