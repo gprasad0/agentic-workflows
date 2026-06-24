@@ -102,7 +102,7 @@ class PipelineState(BaseModel):
 
 
 # -----------HUMAN IN THE LOOP-----------#
-class RegenrateRequest(BaseModel):
+class RegenerateRequest(BaseModel):
     section_name: str  # Which section to redo
     instructions: str = ""  # Any specific instructions for regeneration
     # eg, "Make the pricing more specific or Add more details about SEO"
