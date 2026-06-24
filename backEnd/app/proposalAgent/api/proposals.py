@@ -1,16 +1,17 @@
 from app.proposalAgent.models.schemas import (
     ProposalRequest,
     parsedCallData,
+    ResearchPlanner,
 )
 from app.proposalAgent.models.db_models import get_connection
 
 from app.llm.client import client
-from app.proposalAgent.agents.prompts import parseDataPrompt
+from app.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
 
 
 async def createProposal(body: ProposalRequest):
     parsedData = await parseData(body)
-    researchedData = await researchProposal(parsedData)
+    researchedData = await researchProposalOrchestrator(parsedData)
 
     db_connection = get_connection()
     # Implement proposal generation logic here
@@ -62,7 +63,13 @@ async def parseData(body: ProposalRequest):
     return parsed_data
 
 
-async def researchProposal(parsedData: parsedCallData):
+async def researchProposalOrchestrator(parsedData: parsedCallData):
+    researchPlanner = await client.generate_structured(
+        RESEARCH_PLANNER_PROMPT, ResearchPlanner
+    )
+    print(
+        f"Raw LLM response for researchPlanner:\n{researchPlanner.model_dump_json(indent=2)}\n"
+    )
     return {
         "research_output": "Research output based on the provided proposal request.",
         "retrieved_context": "Retrieved context relevant to the proposal.",

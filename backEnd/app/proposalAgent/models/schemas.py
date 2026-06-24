@@ -106,3 +106,23 @@ class RegenerateRequest(BaseModel):
     section_name: str  # Which section to redo
     instructions: str = ""  # Any specific instructions for regeneration
     # eg, "Make the pricing more specific or Add more details about SEO"
+
+
+# ------------RESEARCH SCHEMAS-----------#
+
+
+class ResearchPlanner(BaseModel):
+    pages: list[str]
+    questions: list[str]
+
+
+class ExtractedFacts(BaseModel):
+    company_summary: str
+    target_audience: str
+    services_offered: list[str]
+    current_marketing: list[str]
+    gaps: list[str]
+    competitors: list[str]
+    opportunities: list[str]
+    recent_news: str = ""
+    tech_stack: list[str] = []
