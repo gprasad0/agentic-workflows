@@ -6,6 +6,7 @@ parseDataPrompt = (
     "If information is missing, use null or empty list as appropriate."
 )
 
+
 RESEARCH_PLANNER_PROMPT = """
 You are a senior business analyst preparing to research a company before writing a professional service proposal.
 

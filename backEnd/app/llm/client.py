@@ -25,11 +25,17 @@ class LLMClient:
 
         return response.choices[0].message.content
 
-    async def generate_structured(self, prompt: str, response_model: Type[T]) -> T:
+    async def generate_structured(
+        self, userPrompt: str, response_model: Type[T], systemPrompt: str = ""
+    ) -> T:
         """Send a prompt and get back a validated Pydantic model instance."""
+        messages = []
+        if systemPrompt:
+            messages.append({"role": "system", "content": systemPrompt})
+        messages.append({"role": "user", "content": userPrompt})
         response = await self.client.chat.completions.create(
             model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+            messages=messages,
             response_format={
                 "type": "json_schema",
                 "json_schema": {

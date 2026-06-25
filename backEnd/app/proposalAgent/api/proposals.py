@@ -64,8 +64,10 @@ async def parseData(body: ProposalRequest):
 
 
 async def researchProposalOrchestrator(parsedData: parsedCallData):
+    userPrompt = f"Here is the parsed discovery call data:\n\n{parsedData.model_dump_json(indent=2)}"
+
     researchPlanner = await client.generate_structured(
-        RESEARCH_PLANNER_PROMPT, ResearchPlanner
+        userPrompt, ResearchPlanner, RESEARCH_PLANNER_PROMPT
     )
     print(
         f"Raw LLM response for researchPlanner:\n{researchPlanner.model_dump_json(indent=2)}\n"
