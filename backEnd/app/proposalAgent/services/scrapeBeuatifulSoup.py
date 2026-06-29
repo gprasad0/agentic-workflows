@@ -26,31 +26,34 @@ async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
             # 3. Parse the HTML using BeautifulSoup
             soup = BeautifulSoup(response.text, "html.parser")
 
-            # 4. Clean the text (Remove scripts, styles, and extra whitespace)
-            for script_or_style in soup(
-                ["script", "style", "noscript", "header", "footer"]
-            ):
-                script_or_style.decompose()
-
-            clean_text = soup.get_text(separator=" ", strip=True)
-
-            # 5. Extract and normalize all internal links
+            # 4. Extract and normalize all internal links BEFORE decomposing the header/footer
             internal_links = set()
             base_domain = urlparse(base_url).netloc
 
             for a_tag in soup.find_all("a", href=True):
                 href = a_tag["href"]
 
-                # Skip mailto:, tel:, and anchor links
-                if href.startswith(("mailto:", "tel:", "#")):
+                # Skip mailto:, tel:, anchor links, and javascript actions
+                if href.startswith(("mailto:", "tel:", "#", "javascript:")):
                     continue
 
                 # Normalize relative URLs (e.g., '/about' -> 'https://example.com/about')
                 full_url = urljoin(base_url, href)
 
+                # Strip trailing slashes to prevent duplicates (e.g., /about and /about/)
+                full_url = full_url.rstrip("/")
+
                 # Only keep internal links (belonging to the same domain)
                 if urlparse(full_url).netloc == base_domain:
                     internal_links.add(full_url)
+
+            # 5. Clean the text (Remove scripts, styles, and extra whitespace)
+            for script_or_style in soup(
+                ["script", "style", "noscript", "header", "footer"]
+            ):
+                script_or_style.decompose()
+
+            clean_text = soup.get_text(separator=" ", strip=True)
 
             return {
                 "success": True,
