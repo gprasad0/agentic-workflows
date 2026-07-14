@@ -4,18 +4,20 @@ from app.proposalAgent.models.schemas import (
     ResearchPlanner,
 )
 from app.proposalAgent.models.db_models import get_connection
-from app.proposalAgent.services.scrapeBeuatifulSoup import (
+from app.proposalAgent.services.scrapeBeautifulSoup import (
     scrape_homepage_and_extract_links,
 )
 from app.llm.client import client
 from app.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
+import json
 
 
 async def createProposal(body: ProposalRequest):
     # parsedData = await parseData(body)
     # researchedData = await researchProposalOrchestrator(parsedData)
     scrapedData = await scrape_homepage_and_extract_links("https://innovkraft.com/")
-    print("scrapedData-->", scrapedData)
+    safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
+    print("scrapedData-->", safe_output)
     db_connection = get_connection()
     # Implement proposal generation logic here
     cursor = db_connection.cursor()
