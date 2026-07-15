@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.proposalAgent.models.db_models import create_tables
+from src.proposalAgent.models.db_models import create_tables
 from appRouter import router
 
 print(

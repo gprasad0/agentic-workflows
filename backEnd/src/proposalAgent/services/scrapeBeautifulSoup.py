@@ -33,7 +33,7 @@ async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
             for a_tag in soup.find_all("a", href=True):
                 href = a_tag["href"]
 
-                # Skip mailto:, tel:, anchor links, and javascript actions
+                # Skip mailto:, tel:, anchor links, and javascript actions : skip useless links
                 if href.startswith(("mailto:", "tel:", "#", "javascript:")):
                     continue
 

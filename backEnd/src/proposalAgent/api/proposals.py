@@ -1,14 +1,14 @@
-from app.proposalAgent.models.schemas import (
+from src.proposalAgent.models.schemas import (
     ProposalRequest,
     parsedCallData,
     ResearchPlanner,
 )
-from app.proposalAgent.models.db_models import get_connection
-from app.proposalAgent.services.scrapeBeautifulSoup import (
+from src.proposalAgent.models.db_models import get_connection
+from src.proposalAgent.services.scrapeBeautifulSoup import (
     scrape_homepage_and_extract_links,
 )
-from app.llm.client import client
-from app.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
+from src.llm.client import client
+from src.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
 import json
 
 
@@ -81,3 +81,14 @@ async def researchProposalOrchestrator(parsedData: parsedCallData):
         "research_output": "Research output based on the provided proposal request.",
         "retrieved_context": "Retrieved context relevant to the proposal.",
     }
+
+
+async def filter_relevant_links(
+    scraped_links: list[str], relevant_keywords: list[str]
+) -> list[str]:
+    """Filter the scraped links based on relevant keywords."""
+    filtered_links = []
+    for link in scraped_links:
+        if any(keyword.lower() in link.lower() for keyword in relevant_keywords):
+            filtered_links.append(link)
+    return filtered_links
