@@ -12,7 +12,7 @@ from src.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_P
 import json
 
 
-async def createProposal(body: ProposalRequest):
+async def createProposal(body: ProposalRequest) -> dict:
     # parsedData = await parseData(body)
     # researchedData = await researchProposalOrchestrator(parsedData)
     scrapedData = await scrape_homepage_and_extract_links("https://innovkraft.com/")
