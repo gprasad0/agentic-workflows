@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     GOOGLE_GEMINI_API_KEY: str
     OPENROUTER_API_KEY: str | None = None
     OPENAI_API_KEY: str | None = None
+    SERPER_API_KEY: str | None = None
 
     MODEL_NAME: str = "gemini-2.5-flash"
 

@@ -3,6 +3,7 @@ import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from typing import List, Dict, Any
+from backend.config import settings
 
 
 async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
@@ -65,6 +66,21 @@ async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
 
     except Exception as e:
         return {"success": False, "url": base_url, "error": str(e)}
+
+
+async def serper_tool(query: str):
+    """Scrapes google with the query params given"""
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://google.serper.dev/search",
+            headers={
+                "X-API-KEY": settings.SERPER_API_KEY,
+                "Content-Type": "application/json",
+            },
+            json={"q": query},
+        )
+
+    return response.json()
 
 
 # # --- Testing the Scraper ---

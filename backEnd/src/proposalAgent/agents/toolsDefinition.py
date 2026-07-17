@@ -1,8 +1,10 @@
 scraper_tool = {
     "type": "function",
     "function": {
-        "name": "scrape_page",
-        "description": "",
+        "name": "scrape_homepage_and_extract_links",
+        "description": """Scrapes a webpage and returns 
+        its text content and internal links. 
+        Use this to research a company's website.""",
         "parameters": {
             "type": "object",
             "properties": {
@@ -19,7 +21,7 @@ scraper_tool = {
 serper_tool = {
     "type": "function",
     "function": {
-        "name": "serpenter_tool",
+        "name": "serper_tool",
         "description": """Search Google for information about a company. 
         Use this to find news, reviews, or public information.""",
         "parameters": {
