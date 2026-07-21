@@ -18,10 +18,10 @@ scraper_tool = {
     },
 }
 
-serper_tool = {
+serper_search_tool = {
     "type": "function",
     "function": {
-        "name": "serper_tool",
+        "name": "serper_search_tool",
         "description": """Search Google for information about a company. 
         Use this to find news, reviews, or public information.""",
         "parameters": {

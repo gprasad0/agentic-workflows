@@ -10,12 +10,14 @@ from src.proposalAgent.services.scrapeBeautifulSoup import (
 from src.llm.client import client
 from src.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
 import json
+from src.proposalAgent.agents.toolsDefinition import scraper_tool, serper_search_tool
 
 
 async def createProposal(body: ProposalRequest) -> dict:
     # parsedData = await parseData(body)
     # researchedData = await researchProposalOrchestrator(parsedData)
     scrapedData = await scrape_homepage_and_extract_links("https://innovkraft.com/")
+    tool = [scraper_tool, serper_search_tool]
     safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
     print("scrapedData-->", safe_output)
     db_connection = get_connection()
