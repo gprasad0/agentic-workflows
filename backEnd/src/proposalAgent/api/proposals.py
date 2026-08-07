@@ -1,3 +1,4 @@
+from backend.src.outreachAgent.nodes import scrape
 from backend.src.proposalAgent.agents.utils import scrapeInternetData
 from src.proposalAgent.models.schemas import (
     ProposalRequest,
@@ -14,6 +15,52 @@ import json
 from src.proposalAgent.agents.toolsDefinition import scraper_tool, serper_search_tool
 
 url = "https://www.hcltech.com/"
+
+# INPUT (you already have this)
+# parsedCallData:
+# - Company name + URL ✅
+# - Industry ✅
+# - Pain points ✅
+# - Goals ✅
+# - Current solution ✅
+# - Budget signals ✅
+#         ↓
+# STEP 1 — Homepage Scraper + Serper
+# (run in parallel)
+# Scraper → links + homepage text
+# Serper → public info, news, reviews
+#         ↓
+# STEP 2 — Research Planner (Deepseek)
+# Takes:
+# - parsedCallData ← GOLD
+# - Homepage text + links
+# - Serper results
+
+# Now it's not guessing pain points
+# It KNOWS them already
+# It just needs to VERIFY and DEEPEN them
+#         ↓
+# STEP 3 — Deep Scraper
+# Scrapes the 6-10 decided pages
+#         ↓
+# STEP 4 — Research Synthesizer
+# Takes:
+# - Deep scraped content
+# - Serper results
+# - parsedCallData
+# - Research questions from Step 2
+
+# Connects what prospect SAID
+# with what website SHOWS
+#         ↓
+# STEP 5 — Proposal/Email Generator
+# Has full picture:
+# - What they said they need
+# - What research confirms
+# - Gaps between the two
+#         ↓
+# OUTPUT
+# Hyper personalized proposal or email
 
 
 async def createProposal(body: ProposalRequest) -> dict:
