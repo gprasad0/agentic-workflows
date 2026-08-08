@@ -13,7 +13,7 @@ class ProposalRequest(BaseModel):
 
 
 # -----------AGENT 1 OUTPUT SCHEMA-----------#
-class parsedCallData(BaseModel):
+class ParsedCallData(BaseModel):
     prospect_name: str
     company_name: str
     industry: str
@@ -93,7 +93,7 @@ class PipelineStatus(str, Enum):
 
 class PipelineState(BaseModel):
     status: PipelineStatus
-    parsed: parsedCallData | None = None
+    parsed: ParsedCallData | None = None
     research: ResearchOutput | None = None
     retrieved: RetrievedContext | None = None
     sections: ProposalSections | None = None

@@ -3,7 +3,7 @@ import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from typing import List, Dict, Any
-from backend.config import settings
+from config import settings
 
 
 async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:

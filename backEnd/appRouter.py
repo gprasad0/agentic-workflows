@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from src.proposalAgent.api.proposals import createProposal
 from src.proposalAgent.api.proposals import getProposal
 from src.proposalAgent.models.schemas import (
-    parsedCallData,
+    ParsedCallData,
     ResearchOutput,
     RetrievedContext,
     ProposalSections,

@@ -1,13 +1,15 @@
-from backend.src.outreachAgent.nodes import scrape
-from backend.src.proposalAgent.agents.utils import scrapeInternetData
+from src.outreachAgent.nodes import scrape
+
+# from src.proposalAgent.agents.utils import scrapeInternetData
 from src.proposalAgent.models.schemas import (
     ProposalRequest,
-    parsedCallData,
+    ParsedCallData,
     ResearchPlanner,
 )
 from src.proposalAgent.models.db_models import get_connection
 from src.proposalAgent.services.scrapeBeautifulSoup import (
     scrape_homepage_and_extract_links,
+    serper_tool,
 )
 from src.llm.client import client
 from src.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
@@ -16,82 +18,47 @@ from src.proposalAgent.agents.toolsDefinition import scraper_tool, serper_search
 
 url = "https://www.hcltech.com/"
 
-# INPUT (you already have this)
-# parsedCallData:
-# - Company name + URL ✅
-# - Industry ✅
-# - Pain points ✅
-# - Goals ✅
-# - Current solution ✅
-# - Budget signals ✅
-#         ↓
-# STEP 1 — Homepage Scraper + Serper
-# (run in parallel)
-# Scraper → links + homepage text
-# Serper → public info, news, reviews
-#         ↓
-# STEP 2 — Research Planner (Deepseek)
-# Takes:
-# - parsedCallData ← GOLD
-# - Homepage text + links
-# - Serper results
 
-# Now it's not guessing pain points
-# It KNOWS them already
-# It just needs to VERIFY and DEEPEN them
-#         ↓
-# STEP 3 — Deep Scraper
-# Scrapes the 6-10 decided pages
-#         ↓
-# STEP 4 — Research Synthesizer
-# Takes:
-# - Deep scraped content
-# - Serper results
-# - parsedCallData
-# - Research questions from Step 2
+researchTools = [scraper_tool, serper_search_tool]
 
-# Connects what prospect SAID
-# with what website SHOWS
-#         ↓
-# STEP 5 — Proposal/Email Generator
-# Has full picture:
-# - What they said they need
-# - What research confirms
-# - Gaps between the two
-#         ↓
-# OUTPUT
-# Hyper personalized proposal or email
+# use scraper and serper to get data -> use this data in the research planner to decide
+# -> which pages to scrape and using the serper data which questions to ask
+# using the scraper again scrape the decide pages
+# using the serper data and the scraped data and the parsed call data synthesize a research output
+
+# Check if serper is working and if the scraper is working
 
 
 async def createProposal(body: ProposalRequest) -> dict:
     # parsedData = await parseData(body)
     # researchedData = await researchProposalOrchestrator(parsedData)
     scrapedData = await scrape_homepage_and_extract_links("https://innovkraft.com/")
-    toolJson = [scraper_tool, serper_search_tool]
-    scrapedData = await scrapeInternetData(toolJson, url)
-    safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
-    print("scrapedData-->", safe_output)
-    db_connection = get_connection()
-    # Implement proposal generation logic here
-    cursor = db_connection.cursor()
-    cursor.execute(
-        """
-        INSERT INTO proposals ( prospect_url, call_notes, title, description, budget, additional_context)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """,
-        (
-            body.prospect_url,
-            body.call_notes,
-            body.title,
-            body.description,
-            body.budget,
-            body.additional_context,
-        ),  # prevents SQL injection by using parameterized queries
-    )
-    proposal_id = cursor.lastrowid
-    db_connection.commit()
-    db_connection.close()
-    return {"message": "Proposal generated successfully", "proposal_id": proposal_id}
+    # serperData = await serper_tool("https://innovkraft.com/")
+    # scrapedData = await scrapeInternetData(researchTools, url, parsedData)
+    # safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
+    # print("scrapedData-->", safe_output)
+    # db_connection = get_connection()
+    # # Implement proposal generation logic here
+    # cursor = db_connection.cursor()
+    # cursor.execute(
+    #     """
+    #     INSERT INTO proposals ( prospect_url, call_notes, title, description, budget, additional_context)
+    #     VALUES (?, ?, ?, ?, ?, ?)
+    #     """,
+    #     (
+    #         body.prospect_url,
+    #         body.call_notes,
+    #         body.title,
+    #         body.description,
+    #         body.budget,
+    #         body.additional_context,
+    #     ),  # prevents SQL injection by using parameterized queries
+    # )
+    # proposal_id = cursor.lastrowid
+    # db_connection.commit()
+    # db_connection.close()
+    # return {"message": "Proposal generated successfully", "proposal_id": proposal_id}
+    return {"message": "Proposal generated successfully"}
 
 
 async def getProposal(proposal_id: int):
@@ -113,7 +80,7 @@ async def getProposal(proposal_id: int):
 
 async def parseData(body: ProposalRequest):
     prompt = parseDataPrompt.format(ProposalRequest=body.model_dump_json(indent=2))
-    parsed_data = await client.generate_structured(prompt, parsedCallData)
+    parsed_data = await client.generate_structured(prompt, ParsedCallData)
     print(
         f"Raw LLM response for structured output:\n{parsed_data.model_dump_json(indent=2)}\n"
     )
@@ -121,7 +88,7 @@ async def parseData(body: ProposalRequest):
     return parsed_data
 
 
-async def researchProposalOrchestrator(parsedData: parsedCallData):
+async def researchProposalOrchestrator(parsedData: ParsedCallData):
     userPrompt = f"Here is the parsed discovery call data:\n\n{parsedData.model_dump_json(indent=2)}"
 
     researchPlanner = await client.generate_structured(
