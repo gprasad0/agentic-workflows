@@ -77,29 +77,26 @@ async def serper_tool(query: str):
                 "X-API-KEY": settings.SERPER_API_KEY,
                 "Content-Type": "application/json",
             },
-            json={"q": query},
+            json={"q": f"{query} company services reviews team size"},
         )
 
     return response.json()
 
 
-# # --- Testing the Scraper ---
-# async def main():
-#     target_url = "https://scrapeme.live/shop/"  # A safe practice target
-#     print(f"Scraping {target_url}...\n")
+# For phase 2 or when we need additional data from th serper api
+# async def searchCompany(company_name: str, url: str):
+#     """
+#     Run multiple targeted searches
+#     and identify scrapeable results
+#     """
 
-#     result = await scrape_homepage_and_extract_links(target_url)
+#     results = {}
 
-#     if result["success"]:
-#         print(f"Found {len(result['internal_links'])} internal links.")
-#         print("\nTop 5 links:")
-#         for link in result["internal_links"][:5]:
-#             print(f"- {link}")
-#         print("\nContent Preview:")
-#         print(result["content_preview"])
-#     else:
-#         print(f"Failed to scrape: {result.get('error')}")
+#     # Query 1 — Company overview
+#     results["overview"] = serper_tool(f"{company_name} company overview services")
 
+#     # Query 2 — Reviews and pain points
+#     results["reviews"] = serper_tool(f"{company_name} reviews problems challenges")
 
-# if __name__ == "__main__":
-#     asyncio.run(main())
+#     # Query3 - Recent news
+#     results["news"] = serper_tool(f"{company_name} 2025 2026 news announcement")
