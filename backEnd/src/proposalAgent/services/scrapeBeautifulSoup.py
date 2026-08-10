@@ -68,6 +68,32 @@ async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
         return {"success": False, "url": base_url, "error": str(e)}
 
 
+#  "summary": """
+#     Company: Innovkraft Inc
+#     Type: Digital Marketing Agency
+#     Location: Bangalore
+#     Team Size: 11-50
+#     Funding: Bootstrapped
+#     Revenue: <$1M
+#     Experience: 6+ years, 300+ projects
+#     Hourly Rate: $50-99/hr
+#     Min Project: $1,000+
+#     Ratings: 4.3 Glassdoor (9), 4.8 AmbitionBox (20)
+#     Hiring: Video editor, Content writer,
+#             SEO Executive, WordPress Developer
+#     Services: Web development, SEO, Photography,
+#               Video, Content Marketing
+#     """
+
+
+async def exrtract_company_overview(query: str):
+    """Collects the needed info from the serper api"""
+    serper_data = await serper_tool(query)
+    results = []
+    for data in serper_data:
+        organicData = data["organic"]
+
+
 async def serper_tool(query: str):
     """Scrapes google with the query params given"""
     async with httpx.AsyncClient() as client:
@@ -77,7 +103,7 @@ async def serper_tool(query: str):
                 "X-API-KEY": settings.SERPER_API_KEY,
                 "Content-Type": "application/json",
             },
-            json={"q": f"{query} company services reviews team size"},
+            json={"q": query},
         )
 
     return response.json()

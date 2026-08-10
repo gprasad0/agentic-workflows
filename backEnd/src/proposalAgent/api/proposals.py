@@ -34,7 +34,9 @@ async def createProposal(body: ProposalRequest) -> dict:
     # researchedData = await researchProposalOrchestrator(parsedData)
     scrapedData = await scrape_homepage_and_extract_links("https://innovkraft.com/")
     print("scrapedData-->", json.dumps(scrapedData, ensure_ascii=True, indent=2))
-    serperData = await serper_tool("https://innovkraft.com/")
+    serperData = await serper_tool(
+        f"https://innovkraft.com/ company services reviews team size"
+    )
     print("serperData-->", json.dumps(serperData, ensure_ascii=True, indent=2))
     # scrapedData = await scrapeInternetData(researchTools, url, parsedData)
     # safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
