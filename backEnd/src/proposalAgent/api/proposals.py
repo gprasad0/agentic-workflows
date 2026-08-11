@@ -9,7 +9,7 @@ from src.proposalAgent.models.schemas import (
 from src.proposalAgent.models.db_models import get_connection
 from src.proposalAgent.services.scrapeBeautifulSoup import (
     scrape_homepage_and_extract_links,
-    serper_tool,
+    exrtract_company_overview,
 )
 from src.llm.client import client
 from src.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
@@ -34,7 +34,7 @@ async def createProposal(body: ProposalRequest) -> dict:
     # researchedData = await researchProposalOrchestrator(parsedData)
     scrapedData = await scrape_homepage_and_extract_links("https://innovkraft.com/")
     print("scrapedData-->", json.dumps(scrapedData, ensure_ascii=True, indent=2))
-    serperData = await serper_tool(
+    serperData = await exrtract_company_overview(
         f"https://innovkraft.com/ company services reviews team size"
     )
     print("serperData-->", json.dumps(serperData, ensure_ascii=True, indent=2))
