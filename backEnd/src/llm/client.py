@@ -26,7 +26,11 @@ class LLMClient:
         return response.choices[0].message.content
 
     async def generate_structured(
-        self, userPrompt: str, response_model: Type[T], systemPrompt: str = ""
+        self,
+        userPrompt: str,
+        response_model: Type[T],
+        tools: list[dict] = [],
+        systemPrompt: str = "",
     ) -> T:
         """Send a prompt and get back a validated Pydantic model instance."""
         messages = []
@@ -43,6 +47,7 @@ class LLMClient:
                     "schema": response_model.model_json_schema(),
                 },
             },
+            tools=tools,
         )
         raw = response.choices[0].message.content
         return response_model.model_validate_json(raw)

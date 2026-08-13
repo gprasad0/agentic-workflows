@@ -29,6 +29,22 @@ class ParsedCallData(BaseModel):
     prospect_url: str = ""  # URL for reference
 
 
+# ----------SCRAPED DATA-------------#
+class ScrapedData(BaseModel):
+    title: str
+    link: str
+    snippet: str
+    rating: float | None = None
+    ratingCount: int | None = None
+
+
+# -----------AGENT RESEARCH PLANNER-----------#
+class ResearchPlanner(BaseModel):
+    internal_links: list[str]
+    scrapedData: list[ScrapedData]
+    scraped_preview: str
+
+
 # -----------AGENT 2 OUTPUT SCHEMA-----------#
 class ResearchOutput(BaseModel):
     company_summary: str  # what the company does

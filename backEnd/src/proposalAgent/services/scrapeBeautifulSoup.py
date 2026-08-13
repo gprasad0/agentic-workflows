@@ -86,6 +86,7 @@ async def exrtract_company_overview(query: str):
         data.pop("position")
         results.append(data)
     print(json.dumps(results, ensure_ascii=True, indent=2))
+    return results
 
 
 async def serper_tool(query: str):

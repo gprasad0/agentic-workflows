@@ -32,12 +32,19 @@ researchTools = [scraper_tool, serper_search_tool]
 async def createProposal(body: ProposalRequest) -> dict:
     # parsedData = await parseData(body)
     # researchedData = await researchProposalOrchestrator(parsedData)
-    scrapedData = await scrape_homepage_and_extract_links("https://innovkraft.com/")
-    print("scrapedData-->", json.dumps(scrapedData, ensure_ascii=True, indent=2))
+    scraped_links = await scrape_homepage_and_extract_links("https://innovkraft.com/")
+    print("scrapedData-->", json.dumps(scraped_links, ensure_ascii=True, indent=2))
     serperData = await exrtract_company_overview(
         f"https://innovkraft.com/ company services reviews team size"
     )
     print("serperData-->", json.dumps(serperData, ensure_ascii=True, indent=2))
+    researchPlanner = researchPlanner(
+        {
+            "internal_links": scraped_links["internal_links"],
+            "scrapedData": serperData,
+            "scraped_preview": scraped_links["content_preview"],
+        }
+    )
     # scrapedData = await scrapeInternetData(researchTools, url, parsedData)
     # safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
     # print("scrapedData-->", safe_output)
@@ -80,6 +87,10 @@ async def getProposal(proposal_id: int):
         return dict(proposal_data)
     else:
         return {"message": "Proposal not found"}
+
+
+async def researchPlanner(researchData: ResearchPlanner):
+    
 
 
 async def parseData(body: ProposalRequest):
