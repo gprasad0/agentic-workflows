@@ -38,13 +38,17 @@ async def createProposal(body: ProposalRequest) -> dict:
         f"https://innovkraft.com/ company services reviews team size"
     )
     print("serperData-->", json.dumps(serperData, ensure_ascii=True, indent=2))
-    researchPlanner = researchPlanner(
-        {
-            "internal_links": scraped_links["internal_links"],
-            "scrapedData": serperData,
-            "scraped_preview": scraped_links["content_preview"],
-        }
+    researchPlannerData = {
+        "pages": scraped_links["internal_links"],
+        "scraped_preview": scraped_links["content_preview"],
+        "scrapedData": serperData["organic"],
+    }
+    research_data = ResearchPlanner(
+        internal_links=researchPlannerData["pages"],
+        scrapedData=researchPlannerData["scrapedData"],
+        scraped_preview=researchPlannerData["scraped_preview"],
     )
+    research_result = researchPlanner(research_data)
     # scrapedData = await scrapeInternetData(researchTools, url, parsedData)
     # safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
     # print("scrapedData-->", safe_output)
@@ -72,6 +76,12 @@ async def createProposal(body: ProposalRequest) -> dict:
     return {"message": "Proposal generated successfully"}
 
 
+def researchPlanner(researchData: ResearchPlanner):
+    # we have allm the data needed. Need to use the tools and ask the
+    #  LLM to decide whic questions and links it needs to pick
+    return 1
+
+
 async def getProposal(proposal_id: int):
     db_connection = get_connection()
     cursor = db_connection.cursor()
@@ -87,10 +97,6 @@ async def getProposal(proposal_id: int):
         return dict(proposal_data)
     else:
         return {"message": "Proposal not found"}
-
-
-async def researchPlanner(researchData: ResearchPlanner):
-    
 
 
 async def parseData(body: ProposalRequest):

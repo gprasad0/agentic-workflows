@@ -129,7 +129,8 @@ class RegenerateRequest(BaseModel):
 
 class ResearchPlanner(BaseModel):
     pages: list[str]
-    questions: list[str]
+    scraped_preview: str
+    scrapedData: list[dict]
 
 
 class ExtractedFacts(BaseModel):
