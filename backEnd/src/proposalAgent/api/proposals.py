@@ -80,13 +80,24 @@ async def createProposal(body: ProposalRequest) -> dict:
 
 
 async def researchPlanner(researchData: ResearchPlannerData, prompt: str):
+
     # we have allm the data needed. Need to use the tools and ask the
     #  LLM to decide whic questions and links it needs to pick
-    userPrompt = (
-        f"Here is the scraped data:\n\n{researchData.model_dump_json(indent=2)}"
-    )
+    user_prompt = f"""
+## Discovery Call Data
+{call_data.model_dump_json(indent=2)}
+
+## Homepage Content
+{homepage_preview}
+
+## Internal Links Found
+{json.dumps(internal_links[:30], indent=2)}
+
+## Public Research
+{serper_summary}
+"""
     parsed_data = await client.gennerate_structured(
-        userPrompt=userPrompt,
+        userPrompt=user_prompt,
         response_model=ResearchPlanner,
         systemPrompt=prompt,
     )

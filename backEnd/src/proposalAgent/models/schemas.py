@@ -47,8 +47,9 @@ class ScrapedData(BaseModel):
 # -----------AGENT RESEARCH PLANNER-----------#
 class ResearchPlanner(BaseModel):
     internal_links: list[str]
-    scrapedData: list[ScrapedData]
-    scraped_preview: str
+    serper_summary: list[ScrapedData]
+    homepage_preview: str
+    call_data: ParsedCallData
 
 
 # -----------AGENT 2 OUTPUT SCHEMA-----------#
