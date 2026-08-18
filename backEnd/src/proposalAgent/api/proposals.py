@@ -5,6 +5,7 @@ from src.proposalAgent.models.schemas import (
     ProposalRequest,
     ParsedCallData,
     ResearchPlanner,
+    ResearchPlannerData,
 )
 from src.proposalAgent.models.db_models import get_connection
 from src.proposalAgent.services.scrapeBeautifulSoup import (
@@ -43,12 +44,14 @@ async def createProposal(body: ProposalRequest) -> dict:
         "scraped_preview": scraped_links["content_preview"],
         "scrapedData": serperData["organic"],
     }
-    research_data = ResearchPlanner(
-        internal_links=researchPlannerData["pages"],
-        scrapedData=researchPlannerData["scrapedData"],
-        scraped_preview=researchPlannerData["scraped_preview"],
+    # research_data = ResearchPlanner(
+    #     internal_links=researchPlannerData["pages"],
+    #     scrapedData=researchPlannerData["scrapedData"],
+    #     scraped_preview=researchPlannerData["scraped_preview"],
+    # )
+    research_result = await researchPlanner(
+        researchPlannerData, RESEARCH_PLANNER_PROMPT
     )
-    research_result = researchPlanner(research_data)
     # scrapedData = await scrapeInternetData(researchTools, url, parsedData)
     # safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
     # print("scrapedData-->", safe_output)
@@ -76,10 +79,18 @@ async def createProposal(body: ProposalRequest) -> dict:
     return {"message": "Proposal generated successfully"}
 
 
-def researchPlanner(researchData: ResearchPlanner):
+async def researchPlanner(researchData: ResearchPlannerData, prompt: str):
     # we have allm the data needed. Need to use the tools and ask the
     #  LLM to decide whic questions and links it needs to pick
-    return 1
+    userPrompt = (
+        f"Here is the scraped data:\n\n{researchData.model_dump_json(indent=2)}"
+    )
+    parsed_data = await client.gennerate_structured(
+        userPrompt=userPrompt,
+        response_model=ResearchPlanner,
+        systemPrompt=prompt,
+    )
+    return parsed_data
 
 
 async def getProposal(proposal_id: int):

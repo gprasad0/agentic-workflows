@@ -29,6 +29,12 @@ class ParsedCallData(BaseModel):
     prospect_url: str = ""  # URL for reference
 
 
+# -----------Research Planner JSON-----------#
+class ResearchPlanner(BaseModel):
+    pages: list[str]
+    questions: list[str]
+
+
 # ----------SCRAPED DATA-------------#
 class ScrapedData(BaseModel):
     title: str
@@ -127,7 +133,7 @@ class RegenerateRequest(BaseModel):
 # ------------RESEARCH SCHEMAS-----------#
 
 
-class ResearchPlanner(BaseModel):
+class ResearchPlannerData(BaseModel):
     pages: list[str]
     scraped_preview: str
     scrapedData: list[dict]
