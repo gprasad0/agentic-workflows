@@ -69,6 +69,8 @@ async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
         return {"success": False, "url": base_url, "error": str(e)}
 
 
+async def deep_scrape_internal_links(urls: list[str]):
+    
 SKIP_DOMAINS = ["instagram.com", "facebook.com", "bebee.com", "twitter.com", "x.com"]
 
 
