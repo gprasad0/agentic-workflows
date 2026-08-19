@@ -6,6 +6,7 @@ from src.proposalAgent.models.schemas import (
     ParsedCallData,
     ResearchPlanner,
     ResearchPlannerData,
+    ResearchPlannerQuestion,
 )
 from src.proposalAgent.models.db_models import get_connection
 from src.proposalAgent.services.scrapeBeautifulSoup import (
@@ -31,8 +32,7 @@ researchTools = [scraper_tool, serper_search_tool]
 
 
 async def createProposal(body: ProposalRequest) -> dict:
-    # parsedData = await parseData(body)
-    # researchedData = await researchProposalOrchestrator(parsedData)
+    parsedData = await parseData(body)
     scraped_links = await scrape_homepage_and_extract_links("https://innovkraft.com/")
     print("scrapedData-->", json.dumps(scraped_links, ensure_ascii=True, indent=2))
     serperData = await exrtract_company_overview(
@@ -42,16 +42,18 @@ async def createProposal(body: ProposalRequest) -> dict:
     researchPlannerData = {
         "pages": scraped_links["internal_links"],
         "scraped_preview": scraped_links["content_preview"],
-        "scrapedData": serperData["organic"],
+        "serperData": serperData,
+        "parsedData": parsedData,
     }
+    research_data = ResearchPlannerData.model_validate(researchPlannerData)
     # research_data = ResearchPlanner(
     #     internal_links=researchPlannerData["pages"],
     #     scrapedData=researchPlannerData["scrapedData"],
     #     scraped_preview=researchPlannerData["scraped_preview"],
     # )
-    research_result = await researchPlanner(
-        researchPlannerData, RESEARCH_PLANNER_PROMPT
-    )
+    research_result = await researchPlanner(research_data, RESEARCH_PLANNER_PROMPT)
+    print("research_result-->", research_result)
+
     # scrapedData = await scrapeInternetData(researchTools, url, parsedData)
     # safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
     # print("scrapedData-->", safe_output)
@@ -84,23 +86,21 @@ async def researchPlanner(researchData: ResearchPlannerData, prompt: str):
     # we have allm the data needed. Need to use the tools and ask the
     #  LLM to decide whic questions and links it needs to pick
     user_prompt = f"""
-## Discovery Call Data
-{call_data.model_dump_json(indent=2)}
-
-## Homepage Content
-{homepage_preview}
-
-## Internal Links Found
-{json.dumps(internal_links[:30], indent=2)}
-
-## Public Research
-{serper_summary}
-"""
-    parsed_data = await client.gennerate_structured(
+                        ## Discovery Call Data
+                        {researchData.parsedData.model_dump_json(indent=2)}
+                        ## Homepage Content
+                        {researchData.scraped_preview}
+                        ## Internal Links Found
+                        {json.dumps(researchData.pages[:30], indent=2)}
+                        ## Public Research
+                        {json.dumps(researchData.serperData, indent=2)}
+                    """
+    parsed_data = await client.generate_structured(
         userPrompt=user_prompt,
-        response_model=ResearchPlanner,
+        response_model=ResearchPlannerQuestion,
         systemPrompt=prompt,
     )
+
     return parsed_data
 
 

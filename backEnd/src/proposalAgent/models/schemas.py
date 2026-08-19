@@ -45,11 +45,9 @@ class ScrapedData(BaseModel):
 
 
 # -----------AGENT RESEARCH PLANNER-----------#
-class ResearchPlanner(BaseModel):
-    internal_links: list[str]
-    serper_summary: list[ScrapedData]
-    homepage_preview: str
-    call_data: ParsedCallData
+class ResearchPlannerQuestion(BaseModel):
+    links: list[str]
+    questions: list[str]
 
 
 # -----------AGENT 2 OUTPUT SCHEMA-----------#
@@ -137,7 +135,8 @@ class RegenerateRequest(BaseModel):
 class ResearchPlannerData(BaseModel):
     pages: list[str]
     scraped_preview: str
-    scrapedData: list[dict]
+    serperData: list[dict]
+    parsedData: ParsedCallData
 
 
 class ExtractedFacts(BaseModel):

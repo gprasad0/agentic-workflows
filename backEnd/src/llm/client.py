@@ -29,7 +29,7 @@ class LLMClient:
         self,
         userPrompt: str,
         response_model: Type[T],
-        tools: list[dict] = [],
+        tools: list[dict] | None = None,
         systemPrompt: str = "",
     ) -> T:
         """Send a prompt and get back a validated Pydantic model instance."""
