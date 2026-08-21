@@ -1,4 +1,5 @@
 from src.outreachAgent.nodes import scrape
+import asyncio
 
 # from src.proposalAgent.agents.utils import scrapeInternetData
 from src.proposalAgent.models.schemas import (
@@ -12,7 +13,9 @@ from src.proposalAgent.models.db_models import get_connection
 from src.proposalAgent.services.scrapeBeautifulSoup import (
     scrape_homepage_and_extract_links,
     exrtract_company_overview,
+    scrape_single_page,
 )
+import httpx
 from src.llm.client import client
 from src.proposalAgent.agents.prompts import parseDataPrompt, RESEARCH_PLANNER_PROMPT
 import json
@@ -23,12 +26,7 @@ url = "https://www.hcltech.com/"
 
 researchTools = [scraper_tool, serper_search_tool]
 
-# use scraper and serper to get data -> use this data in the research planner to decide
-# -> which pages to scrape and using the serper data which questions to ask
-# using the scraper again scrape the decide pages
-# using the serper data and the scraped data and the parsed call data synthesize a research output
-
-# Check if serper is working and if the scraper is working
+# researchplanner is done - > now need to add the deep_scraper() and synthesizer
 
 
 async def createProposal(body: ProposalRequest) -> dict:
@@ -46,13 +44,10 @@ async def createProposal(body: ProposalRequest) -> dict:
         "parsedData": parsedData,
     }
     research_data = ResearchPlannerData.model_validate(researchPlannerData)
-    # research_data = ResearchPlanner(
-    #     internal_links=researchPlannerData["pages"],
-    #     scrapedData=researchPlannerData["scrapedData"],
-    #     scraped_preview=researchPlannerData["scraped_preview"],
-    # )
     research_result = await researchPlanner(research_data, RESEARCH_PLANNER_PROMPT)
     print("research_result-->", research_result)
+    scraped_pages = await deep_scraper(research_result.links)
+    print("scraped_pages-->", scraped_pages)
 
     # scrapedData = await scrapeInternetData(researchTools, url, parsedData)
     # safe_output = json.dumps(scrapedData, ensure_ascii=True, indent=2)
@@ -102,6 +97,12 @@ async def researchPlanner(researchData: ResearchPlannerData, prompt: str):
     )
 
     return parsed_data
+
+
+async def deep_scraper(links: list[str]):
+    async with httpx.AsyncClient() as http_client:
+        page_requests = [scrape_single_page(http_client, link) for link in links]
+        return await asyncio.gather(*page_requests)
 
 
 async def getProposal(proposal_id: int):

@@ -7,6 +7,52 @@ from config import settings
 import json
 
 
+async def scrape_single_page(client: httpx.AsyncClient, url: str) -> dict:
+    try:
+        response = await client.get(url)
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Remove all noise
+        for tag in soup(
+            [
+                "script",
+                "style",
+                "noscript",
+                "header",
+                "footer",
+                "nav",
+                "iframe",
+                "svg",
+                "img",
+            ]
+        ):
+            tag.decompose()
+
+        # Get clean text
+        text = soup.get_text(separator=" ", strip=True)
+
+        # Remove extra whitespace
+        text = " ".join(text.split())
+
+        return {"url": url, "success": True, "content": text[:3000]}
+
+    except httpx.TimeoutException:
+        return {"url": url, "success": False, "content": "", "error": "timeout"}
+
+    except httpx.HTTPStatusError as e:
+        return {
+            "url": url,
+            "success": False,
+            "content": "",
+            "error": f"HTTP {e.response.status_code}",
+        }
+
+    except Exception as e:
+        return {"url": url, "success": False, "content": "", "error": str(e)}
+
+
 async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
     """
     Scrapes a homepage, extracts the readable text, and returns a deduplicated
@@ -69,8 +115,8 @@ async def scrape_homepage_and_extract_links(base_url: str) -> Dict[str, Any]:
         return {"success": False, "url": base_url, "error": str(e)}
 
 
-async def deep_scrape_internal_links(urls: list[str]):
-    
+# async def deep_scrape_internal_links(urls: list[str]):
+
 SKIP_DOMAINS = ["instagram.com", "facebook.com", "bebee.com", "twitter.com", "x.com"]
 
 
