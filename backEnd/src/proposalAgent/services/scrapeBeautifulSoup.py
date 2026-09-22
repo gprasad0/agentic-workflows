@@ -9,7 +9,7 @@ import json
 
 async def scrape_single_page(client: httpx.AsyncClient, url: str) -> dict:
     try:
-        response = await client.get(url)
+        response = await client.get(url, follow_redirects=True)
         response.raise_for_status()
 
         soup = BeautifulSoup(response.text, "html.parser")
